@@ -6,59 +6,74 @@ function computerPlay(){
 }
 
 function playRound(playerSelection, computerSelection){
-    let message;
+    let result;
     
-    if(playerSelection.toLowerCase() === computerSelection.toLowerCase()){
-        message = 'It\'s a tie!';
-    } else if(playerSelection.toLowerCase() === 'rock' && computerSelection.toLowerCase() === 'scissors'){
-        message = 'You win! Rock beats Scissors';
-    } else if(playerSelection.toLowerCase() === 'rock' && computerSelection.toLowerCase() === 'paper'){
-        message = 'You lose! Paper beats Rock';
-    } else if(playerSelection.toLowerCase() === 'paper' && computerSelection.toLowerCase() === 'rock'){
-        message = 'You win! Paper beats Rock';
-    } else if(playerSelection.toLowerCase() === 'paper' && computerSelection.toLowerCase() === 'scissors'){
-        message = 'You lose! Scissors beats Paper';
-    } else if(playerSelection.toLowerCase() === 'scissors' && computerSelection.toLowerCase() === 'paper'){
-        message = 'You win! Scissors beats Paper';
+    if(playerSelection === computerSelection){
+        result = 'tie';
+    } else if(playerSelection === 'Rock' && computerSelection === 'Scissors'){
+        result = 'win';
+    } else if(playerSelection === 'Rock' && computerSelection === 'Paper'){
+        result = 'lose';
+    } else if(playerSelection === 'Paper' && computerSelection === 'Rock'){
+        result = 'win';
+    } else if(playerSelection === 'Paper' && computerSelection === 'Scissors'){
+        result = 'lose';
+    } else if(playerSelection === 'Scissors' && computerSelection === 'Paper'){
+        result = 'win';
     } else {
-        message = 'You win! Rock beats Scissors';
-    }
-
-    return message;
-}
-
-//function that plays 5 rounds of the game
-function game(){
-    let playerSelection;
-    let validString = false;
-
-    for(let i=0; i<5; i++){
-        while(!validString){
-            playerSelection = prompt('Rock, Paper or Scissors?');
-            //if the user close the prompt, change the null to an empty string
-            if(playerSelection === null){
-                playerSelection = '';
-            }
-
-            validString = validatePrompt(playerSelection);
-        }
-        console.log(`Try number ${i+1}`);
-        console.log(playRound(playerSelection, computerPlay()));
-        validString = false;
-    }
-}
-
-//validates that the user only enters rock, paper or scissors
-function validatePrompt(validChoice){
-    let result = false;
-
-    if(validChoice.toLowerCase() === 'rock' || validChoice.toLowerCase() === 'paper' || validChoice.toLowerCase() === 'scissors'){
-        result = true;
-    } else{
-        console.log('Please type Rock, Paper or Scissors');
+        result = 'lose';
     }
 
     return result;
 }
 
-game();
+function refreshPage(){
+    location.reload();
+}
+
+function createResetButton(){
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Play again';
+    resetButton.addEventListener('click', refreshPage);
+    container.appendChild(resetButton);
+}
+
+const buttons = document.querySelectorAll('button');
+const playerScore = document.querySelector('#playerScore');
+const computerScore = document.querySelector('#computerScore');
+const container = document.querySelector('.container');
+let playerCounter = 0;
+let computerCounter = 0;
+let result;
+
+buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        result = playRound(button.textContent, computerPlay());
+
+        if(result === 'win'){
+            playerCounter += 1;
+            playerScore.textContent = playerCounter;
+        } else if(result === 'lose'){
+            computerCounter += 1;
+            computerScore.textContent = computerCounter;
+        }
+
+        if(playerCounter === 5 || computerCounter === 5){
+            buttons.forEach(button => button.remove());
+
+            const announceWinner = document.createElement('div');
+            announceWinner.style.fontSize = '70px';
+            
+            if(playerCounter === 5){
+                announceWinner.textContent = 'You win!';
+                announceWinner.style.color = 'blue';
+            } else {
+                announceWinner.textContent = 'Computer wins!';
+                announceWinner.style.color = 'red';
+            }
+
+            container.appendChild(announceWinner);
+            createResetButton();
+        }
+    })
+});
